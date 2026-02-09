@@ -2,15 +2,17 @@ import MatchDetailContent from '@/app/components/matching/MatchDetailContent';
 import BottomNav from '@/app/components/shared/BottomNav';
 
 interface MatchDetailPageProps {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
-export default function MatchDetailPage({ params }: MatchDetailPageProps) {
+export default async function MatchDetailPage({ params }: MatchDetailPageProps) {
+  const { id } = await params;
+  
   return (
     <>
-      <MatchDetailContent matchId={params.id} />
+      <MatchDetailContent matchId={id} />
       <BottomNav />
     </>
   );
