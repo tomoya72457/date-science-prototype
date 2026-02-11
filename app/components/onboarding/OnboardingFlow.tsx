@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Brain } from 'lucide-react';
 import { CONFLICT_QUESTIONS } from '@/app/lib/constants';
 import QuestionStep from './QuestionStep';
 import ResultStep from './ResultStep';

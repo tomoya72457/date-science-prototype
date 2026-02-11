@@ -1,3 +1,5 @@
+'use client';
+
 import { ChevronRight } from 'lucide-react';
 import type { ConflictQuestion } from '@/app/lib/types';
 
