@@ -15,42 +15,24 @@ export default function OnboardingFlow() {
   const [answers, setAnswers] = useState<AnswerType[]>([]);
 
   const calculateUserType = (answers: AnswerType[]): string => {
-    const counts = answers.reduce((acc, answer) => {
-      acc[answer] = (acc[answer] || 0) + 1;
-      return acc;
-    }, {} as Record<AnswerType, number>);
-
-    const maxCount = Math.max(...Object.values(counts));
-    const dominantTypes = Object.entries(counts)
-      .filter(([_, count]) => count === maxCount)
-      .map(([type]) => type);
-
-    // 複数の傾向が同点の場合の処理
-    if (dominantTypes.length > 1) {
-      if (dominantTypes.includes('logic') && dominantTypes.includes('emotion')) {
-        return "バランス調整型 (Balanced Mediator)";
-      }
-      if (dominantTypes.includes('logic') && dominantTypes.includes('avoid')) {
-        return "戦略的回避型 (Strategic Avoider)";
-      }
-      if (dominantTypes.includes('emotion') && dominantTypes.includes('avoid')) {
-        return "配慮重視型 (Caring Considerate)";
-      }
-    }
-
-    // 単一の傾向が優勢な場合
-    const dominantType = dominantTypes[0] as AnswerType;
+    // 2問の回答から9通りのタイプを判定
+    const [first, second] = answers;
     
-    switch (dominantType) {
-      case 'logic':
-        return "論理的解決型 (Logical Solver)";
-      case 'emotion':
-        return "共感優先型 (Empathy First)";
-      case 'avoid':
-        return "平和主義型 (Peaceful Harmonizer)";
-      default:
-        return "バランス調整型 (Balanced Mediator)";
-    }
+    // 9つの組み合わせパターン
+    const typeMap: Record<string, string> = {
+      'logic-logic': '完全論理型 (Pure Analyzer)',
+      'logic-emotion': '戦略的共感型 (Strategic Empath)',
+      'logic-avoid': '効率重視型 (Efficiency Seeker)',
+      'emotion-logic': '感情的理性型 (Emotional Rationalist)',
+      'emotion-emotion': '純粋共感型 (Pure Empath)',
+      'emotion-avoid': '配慮優先型 (Considerate Harmonizer)',
+      'avoid-logic': '平和的合理主義 (Peaceful Pragmatist)',
+      'avoid-emotion': '調和的感受性 (Harmonious Sensitive)',
+      'avoid-avoid': '完全平和主義 (Pure Peacekeeper)'
+    };
+    
+    const key = `${first}-${second}`;
+    return typeMap[key] || 'バランス型 (Balanced Type)';
   };
 
   const handleAnswer = (answerType: AnswerType) => {
