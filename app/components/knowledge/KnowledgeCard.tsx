@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import type { Knowledge } from '@/app/lib/types';
 
 interface KnowledgeCardProps {
@@ -8,7 +9,10 @@ export default function KnowledgeCard({ knowledge }: KnowledgeCardProps) {
   const Icon = knowledge.icon;
 
   return (
-    <div className="bg-slate-800 rounded-xl p-4 border border-slate-700 hover:border-slate-500 transition-colors cursor-pointer group">
+    <Link 
+      href={`/knowledge/${knowledge.id}`}
+      className="block bg-slate-800 rounded-xl p-4 border border-slate-700 hover:border-slate-500 transition-colors cursor-pointer group"
+    >
       <div className="flex items-start justify-between mb-2">
         <span className="text-[10px] font-bold text-rose-400 bg-rose-500/10 px-2 py-1 rounded border border-rose-500/20">
           {knowledge.category}
@@ -32,6 +36,6 @@ export default function KnowledgeCard({ knowledge }: KnowledgeCardProps) {
           <span key={tag} className="text-[10px] text-slate-500">#{tag}</span>
         ))}
       </div>
-    </div>
+    </Link>
   );
 }

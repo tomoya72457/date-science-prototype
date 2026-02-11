@@ -41,6 +41,22 @@ export interface Knowledge {
   tags: string[];
   likes: number;
   icon: LucideIcon;
+  content?: KnowledgeContent;
+}
+
+// ナレッジ詳細コンテンツ
+export interface KnowledgeContent {
+  introduction: string;
+  sections: KnowledgeSection[];
+  keyTakeaways: string[];
+  successRate?: string;
+  dataSource?: string;
+}
+
+export interface KnowledgeSection {
+  heading: string;
+  content: string;
+  tips?: string[];
 }
 
 // コンフリクト解決質問の選択肢
