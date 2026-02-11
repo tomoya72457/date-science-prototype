@@ -247,6 +247,33 @@ export const CONFLICT_QUESTIONS: ConflictQuestion[] = [
       { label: "お互いの不安な点を話し合い、妥協点を探る", type: "emotion" },
       { label: "とりあえず共通の財布を作り、残りは干渉しない", type: "avoid" }
     ]
+  },
+  {
+    id: 3,
+    text: "相手が仕事のストレスで落ち込んでいる様子です。あなたはどうしますか？",
+    options: [
+      { label: "具体的な解決策やアドバイスを提案する", type: "logic" },
+      { label: "話を聞いて共感し、励ましの言葉をかける", type: "emotion" },
+      { label: "そっとしておいて、気分転換に誘う", type: "avoid" }
+    ]
+  },
+  {
+    id: 4,
+    text: "デートで行きたい場所について意見が分かれました。どう対処しますか？",
+    options: [
+      { label: "双方の希望をリスト化し、メリットを比較検討する", type: "logic" },
+      { label: "相手がなぜその場所に行きたいのか理由を聞いて理解する", type: "emotion" },
+      { label: "じゃんけんで決めるか、次回に相手の希望を優先すると提案", type: "avoid" }
+    ]
+  },
+  {
+    id: 5,
+    text: "相手の友人との集まりに誘われましたが、あまり気乗りしません。",
+    options: [
+      { label: "正直に理由を説明し、別の提案をする", type: "logic" },
+      { label: "相手にとって大切なことだと理解し、笑顔で参加する", type: "emotion" },
+      { label: "今回は予定があると伝え、次回は参加すると約束する", type: "avoid" }
+    ]
   }
 ];
 

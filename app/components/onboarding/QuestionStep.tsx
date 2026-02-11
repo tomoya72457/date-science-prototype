@@ -1,11 +1,13 @@
 import { ChevronRight } from 'lucide-react';
 import type { ConflictQuestion } from '@/app/lib/types';
 
+type AnswerType = 'logic' | 'emotion' | 'avoid';
+
 interface QuestionStepProps {
   question: ConflictQuestion;
   currentStep: number;
   totalSteps: number;
-  onAnswer: () => void;
+  onAnswer: (answerType: AnswerType) => void;
 }
 
 export default function QuestionStep({ question, currentStep, totalSteps, onAnswer }: QuestionStepProps) {
@@ -32,7 +34,7 @@ export default function QuestionStep({ question, currentStep, totalSteps, onAnsw
         {question.options.map((option, idx) => (
           <button
             key={idx}
-            onClick={onAnswer}
+            onClick={() => onAnswer(option.type)}
             className="w-full text-left p-4 bg-slate-800 border border-slate-700 rounded-xl hover:border-rose-500 hover:bg-slate-750 transition-all text-slate-200 text-sm group"
           >
             <div className="flex justify-between items-center">
