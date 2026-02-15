@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
+import Link from 'next/link';
 import { MOCK_KNOWLEDGE } from '@/app/lib/constants';
 import KnowledgeCard from './KnowledgeCard';
 import CategoryTabs from './CategoryTabs';
@@ -53,9 +54,12 @@ export default function KnowledgeContent() {
           <div className="relative z-10">
             <h3 className="font-bold text-white text-sm mb-1">もっとナレッジを見る</h3>
             <p className="text-[10px] text-slate-400 mb-3">プレミアム会員は全2,400件のデータを閲覧可能</p>
-            <button className="px-4 py-2 bg-slate-200 text-slate-900 text-xs font-bold rounded-lg hover:bg-white transition-colors">
+            <Link 
+              href="/plan"
+              className="inline-block px-4 py-2 bg-slate-200 text-slate-900 text-xs font-bold rounded-lg hover:bg-white transition-colors"
+            >
               プラン詳細へ
-            </button>
+            </Link>
           </div>
         </div>
       </div>
