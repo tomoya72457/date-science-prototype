@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { ArrowLeft, Heart, MessageCircle, Brain, Star } from 'lucide-react';
@@ -13,6 +14,7 @@ interface MatchDetailContentProps {
 export default function MatchDetailContent({ matchId }: MatchDetailContentProps) {
   const router = useRouter();
   const match = MOCK_MATCHES.find(m => m.id === parseInt(matchId));
+  const [isLiked, setIsLiked] = useState(false);
 
   if (!match) {
     return (
@@ -150,11 +152,18 @@ export default function MatchDetailContent({ matchId }: MatchDetailContentProps)
 
         {/* Action Buttons */}
         <div className="grid grid-cols-2 gap-3">
-          <button className="py-4 bg-slate-700 hover:bg-slate-600 text-white font-bold rounded-xl transition-colors flex items-center justify-center gap-2 border border-slate-600">
-            <Heart size={18} />
-            <span>いいね！</span>
+          <button 
+            onClick={() => setIsLiked(!isLiked)}
+            className={`py-4 font-bold rounded-xl transition-all flex items-center justify-center gap-2 border ${
+              isLiked 
+                ? 'bg-rose-500 hover:bg-rose-600 text-white border-rose-500 shadow-lg shadow-rose-500/25' 
+                : 'bg-slate-700 hover:bg-slate-600 text-white border-slate-600'
+            }`}
+          >
+            <Heart size={18} fill={isLiked ? 'currentColor' : 'none'} />
+            <span>{isLiked ? 'いいね済み' : 'いいね！'}</span>
           </button>
-          <button className="py-4 bg-rose-500 hover:bg-rose-600 text-white font-bold rounded-xl transition-colors flex items-center justify-center gap-2 shadow-lg shadow-rose-500/25">
+          <button className="py-4 bg-slate-200 hover:bg-white text-slate-900 font-bold rounded-xl transition-colors flex items-center justify-center gap-2 border border-slate-700">
             <MessageCircle size={18} />
             <span>メッセージ</span>
           </button>
