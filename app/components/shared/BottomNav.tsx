@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Activity, Search, BookOpen, ClipboardCheck, User, LucideIcon } from 'lucide-react';
+import { Activity, Search, MessageCircle, BookOpen, ClipboardCheck, User, LucideIcon } from 'lucide-react';
 
 interface NavItem {
   href: string;
@@ -13,6 +13,7 @@ interface NavItem {
 const NAV_ITEMS: NavItem[] = [
   { href: '/dashboard', icon: Activity, label: 'ホーム' },
   { href: '/matching', icon: Search, label: 'さがす' },
+  { href: '/talk', icon: MessageCircle, label: 'トーク' },
   { href: '/knowledge', icon: BookOpen, label: 'ナレッジ' },
   { href: '/review', icon: ClipboardCheck, label: '振り返り' },
   { href: '/asset', icon: User, label: 'データ' },
@@ -24,7 +25,7 @@ export default function BottomNav() {
   return (
     <nav className="bg-slate-900 border-t border-slate-800 flex justify-between items-center px-4 pb-safe absolute bottom-0 w-full z-50 h-[72px]">
       {NAV_ITEMS.map(({ href, icon: Icon, label }) => {
-        const isActive = pathname === href;
+        const isActive = pathname === href || (href === '/talk' && pathname.startsWith('/talk'));
         return (
           <Link
             key={href}

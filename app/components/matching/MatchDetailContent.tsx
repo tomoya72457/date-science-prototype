@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowLeft, Heart, MessageCircle, Brain, Star, Sparkles, MapPin } from 'lucide-react';
 import { MOCK_MATCHES, MOCK_USER, MATCH_RECOMMENDATIONS } from '@/app/lib/constants';
@@ -163,10 +164,13 @@ export default function MatchDetailContent({ matchId }: MatchDetailContentProps)
             <Heart size={18} fill={isLiked ? 'currentColor' : 'none'} />
             <span>{isLiked ? 'いいね済み' : 'いいね！'}</span>
           </button>
-          <button className="py-4 bg-slate-200 hover:bg-white text-slate-900 font-bold rounded-xl transition-colors flex items-center justify-center gap-2 border border-slate-700">
+          <Link
+            href={`/talk/${match.id}`}
+            className="py-4 bg-slate-200 hover:bg-white text-slate-900 font-bold rounded-xl transition-colors flex items-center justify-center gap-2 border border-slate-700"
+          >
             <MessageCircle size={18} />
             <span>メッセージ</span>
-          </button>
+          </Link>
         </div>
 
         {/* マッチング成功後の推奨コンテンツ */}
