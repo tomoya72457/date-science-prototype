@@ -762,5 +762,67 @@ export const MOCK_DATE_PLANS: Record<string, import('./types').DatePlan[]> = {
       ],
       aiComment: "デザイナーやクリエイティブ系の相手には表参道がおすすめ。街自体がコンテンツなので沈黙を気にせず歩けます。"
     }
+  ],
+  "新宿": [
+    {
+      id: 5,
+      title: "新宿エリア 王道デートコース",
+      theme: "カフェ × 庭園散策 × ディナー",
+      totalBudget: "¥5,000〜8,000",
+      totalTime: "約4時間",
+      matchScore: 89,
+      spots: [
+        { id: 1, name: "Paul Bassett 新宿", category: "cafe", time: "14:00", duration: "45min", budget: "¥1,000", description: "世界バリスタチャンピオンのカフェ。ラテアートが美しく話題になる。", tip: "「コーヒー好き？」で好みの話題へ自然に", area: "新宿" },
+        { id: 2, name: "新宿御苑", category: "walk", time: "15:00", duration: "60min", budget: "¥500", description: "四季折々の自然が楽しめる広大な庭園。歩きながらリラックスして会話できる。", tip: "写真スポットで「撮ろうよ」が自然な距離感に", area: "新宿御苑前" },
+        { id: 3, name: "LUMINE EST レストラン街", category: "restaurant", time: "16:30", duration: "90min", budget: "¥3,500〜5,500", description: "多ジャンルから選べるレストラン街。相手の好みに合わせやすい。", tip: "「何系が好き？」で食の好みを自然に探れる", area: "新宿" }
+      ],
+      aiComment: "新宿御苑の散策でリラックスした雰囲気を作ってからディナーへ。自然の中の会話で距離が縮まりやすいコースです。"
+    },
+    {
+      id: 6,
+      title: "新宿エリア 夜景満喫コース",
+      theme: "展望 × バー × ディナー",
+      totalBudget: "¥7,000〜11,000",
+      totalTime: "約3.5時間",
+      matchScore: 91,
+      spots: [
+        { id: 1, name: "東京都庁展望室", category: "activity", time: "17:00", duration: "30min", budget: "¥0", description: "無料で楽しめる絶景スポット。夕暮れ時がベスト。", tip: "夕日→夜景の変化を共有すると特別感が出る", area: "西新宿" },
+        { id: 2, name: "Park Hyatt バー", category: "bar", time: "17:45", duration: "60min", budget: "¥3,000〜5,000", description: "52階からの夜景が圧巻。映画「ロスト・イン・トランスレーション」の舞台。", tip: "景色を見ながらだと深い話がしやすい", area: "西新宿" },
+        { id: 3, name: "思い出横丁", category: "restaurant", time: "19:00", duration: "90min", budget: "¥3,000〜4,000", description: "レトロな雰囲気の飲み屋街。ギャップで親近感が生まれる。", tip: "高級→庶民的のギャップで「飾らない自分」を演出", area: "新宿西口" }
+      ],
+      aiComment: "都庁展望室→ホテルバー→横丁のギャップが印象的なコース。特別感と親近感の両方を演出できます。"
+    }
+  ],
+  "池袋": [
+    {
+      id: 7,
+      title: "池袋エリア カルチャーコース",
+      theme: "水族館 × カフェ × ディナー",
+      totalBudget: "¥6,000〜9,000",
+      totalTime: "約4時間",
+      matchScore: 87,
+      spots: [
+        { id: 1, name: "サンシャイン水族館", category: "activity", time: "14:00", duration: "90min", budget: "¥2,600", description: "空飛ぶペンギンが人気のビル屋上水族館。共通体験でアイスブレイク。", tip: "「どの生き物が好き？」で自然に性格が見える", area: "東池袋" },
+        { id: 2, name: "Café AALIYA", category: "cafe", time: "15:45", duration: "45min", budget: "¥900", description: "フレンチトーストが名物の老舗カフェ。水族館の感想を語り合うのに最適。", tip: "「さっきの○○可愛かったね」で体験を振り返る", area: "池袋東口" },
+        { id: 3, name: "無敵家", category: "restaurant", time: "17:00", duration: "60min", budget: "¥1,200", description: "池袋を代表するラーメン店。カジュアルな雰囲気が親近感を生む。", tip: "「ラーメン好き？」でカジュアルな一面を見せる", area: "池袋東口" }
+      ],
+      aiComment: "水族館という共通体験からスタートすることで、自然に打ち解けやすいコース。初デートにおすすめです。"
+    }
+  ],
+  "銀座": [
+    {
+      id: 8,
+      title: "銀座エリア 大人の上質コース",
+      theme: "ギャラリー × アフタヌーンティー × ディナー",
+      totalBudget: "¥10,000〜15,000",
+      totalTime: "約4時間",
+      matchScore: 90,
+      spots: [
+        { id: 1, name: "銀座メゾンエルメス フォーラム", category: "activity", time: "14:00", duration: "45min", budget: "¥0", description: "無料で楽しめるアートギャラリー。洗練された空間で感性を共有。", tip: "アートの感想で知性と感性の両方を見せられる", area: "銀座" },
+        { id: 2, name: "GINZA SIX ラウンジ", category: "cafe", time: "15:00", duration: "60min", budget: "¥3,000〜5,000", description: "銀座のランドマークでアフタヌーンティー。特別感のある空間。", tip: "「ご褒美感あるね」で二人だけの特別感を演出", area: "銀座" },
+        { id: 3, name: "銀座 小十", category: "restaurant", time: "17:00", duration: "90min", budget: "¥6,000〜8,000", description: "本格和食のカウンター割烹。板前との距離が近く、料理の話題で会話が弾む。", tip: "「日本食好き？」で食文化の話題を広げる", area: "銀座" }
+      ],
+      aiComment: "銀座ならではの上質な体験を通じて、大人のデートを演出。2回目以降や特別な日のデートに最適です。"
+    }
   ]
 };

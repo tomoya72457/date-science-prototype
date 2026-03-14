@@ -1,19 +1,56 @@
-// Google Maps API ユーティリティ
+// Google Maps JavaScript API ローダー
 
 const API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ?? '';
 
-// 場所をジオコーディング（住所/駅名 → 緯度経度）
-export async function geocode(address: string): Promise<{ lat: number; lng: number } | null> {
-  const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&language=ja&key=${API_KEY}`;
-  const res = await fetch(url);
-  const data = await res.json();
-  if (data.status === 'OK' && data.results.length > 0) {
-    return data.results[0].geometry.location;
-  }
-  return null;
+let loadPromise: Promise<void> | null = null;
+
+export function loadGoogleMaps(): Promise<void> {
+  if (typeof window === 'undefined') return Promise.reject('SSR');
+  if (window.google?.maps) return Promise.resolve();
+  if (loadPromise) return loadPromise;
+
+  loadPromise = new Promise((resolve, reject) => {
+    const script = document.createElement('script');
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${API_KEY}&libraries=places&language=ja`;
+    script.async = true;
+    script.onload = () => resolve();
+    script.onerror = () => reject(new Error('Google Maps の読み込みに失敗しました'));
+    document.head.appendChild(script);
+  });
+
+  return loadPromise;
 }
 
-// 周辺スポット検索（Nearby Search）
+// タイムアウト付きPromise
+function withTimeout<T>(promise: Promise<T>, ms: number, fallback: T): Promise<T> {
+  return Promise.race([
+    promise,
+    new Promise<T>((resolve) => setTimeout(() => resolve(fallback), ms)),
+  ]);
+}
+
+// ジオコーディング（住所/駅名 → 緯度経度）
+export function geocode(address: string): Promise<{ lat: number; lng: number; name: string } | null> {
+  const inner = new Promise<{ lat: number; lng: number; name: string } | null>((resolve) => {
+    try {
+      const geocoder = new google.maps.Geocoder();
+      geocoder.geocode({ address, region: 'jp' }, (results, status) => {
+        console.log(`[geocode] "${address}" → status: ${status}`);
+        if (status === 'OK' && results && results.length > 0) {
+          const loc = results[0].geometry.location;
+          resolve({ lat: loc.lat(), lng: loc.lng(), name: results[0].formatted_address });
+        } else {
+          resolve(null);
+        }
+      });
+    } catch (err) {
+      console.error('[geocode] Exception:', err);
+      resolve(null);
+    }
+  });
+  return withTimeout(inner, 5000, null);
+}
+
 export interface PlaceResult {
   name: string;
   vicinity: string;
@@ -25,37 +62,92 @@ export interface PlaceResult {
   placeId: string;
 }
 
-export async function searchNearby(
+// 周辺検索（Places Nearby Search）
+export function searchNearby(
   lat: number,
   lng: number,
   type: string,
   radius: number = 1000
 ): Promise<PlaceResult[]> {
-  const url = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lng}&radius=${radius}&type=${type}&language=ja&key=${API_KEY}`;
-  const res = await fetch(url);
-  const data = await res.json();
-  if (data.status === 'OK') {
-    return data.results.slice(0, 5).map((p: Record<string, unknown>) => ({
-      name: p.name as string,
-      vicinity: p.vicinity as string,
-      rating: (p.rating as number) ?? 0,
-      types: (p.types as string[]) ?? [],
-      lat: (p.geometry as { location: { lat: number; lng: number } }).location.lat,
-      lng: (p.geometry as { location: { lat: number; lng: number } }).location.lng,
-      priceLevel: p.price_level as number | undefined,
-      placeId: p.place_id as string,
-    }));
-  }
-  return [];
+  const inner = new Promise<PlaceResult[]>((resolve) => {
+    try {
+      const div = document.createElement('div');
+      const service = new google.maps.places.PlacesService(div);
+
+      service.nearbySearch(
+        {
+          location: new google.maps.LatLng(lat, lng),
+          radius,
+          type,
+        },
+        (results, status) => {
+          console.log(`[nearbySearch] type=${type} → status: ${status}, count: ${results?.length ?? 0}`);
+          if (status === google.maps.places.PlacesServiceStatus.OK && results) {
+            const places: PlaceResult[] = results.slice(0, 8).map((p) => ({
+              name: p.name ?? '',
+              vicinity: p.vicinity ?? '',
+              rating: p.rating ?? 0,
+              types: p.types ?? [],
+              lat: p.geometry?.location?.lat() ?? 0,
+              lng: p.geometry?.location?.lng() ?? 0,
+              priceLevel: p.price_level,
+              placeId: p.place_id ?? '',
+            }));
+            resolve(places);
+          } else {
+            resolve([]);
+          }
+        }
+      );
+    } catch (err) {
+      console.error('[nearbySearch] Exception:', err);
+      resolve([]);
+    }
+  });
+  return withTimeout(inner, 8000, []);
 }
 
-// 2点間の距離（km）
-export function distanceKm(lat1: number, lng1: number, lat2: number, lng2: number): number {
-  const R = 6371;
-  const dLat = ((lat2 - lat1) * Math.PI) / 180;
-  const dLng = ((lng2 - lng1) * Math.PI) / 180;
-  const a =
-    Math.sin(dLat / 2) ** 2 +
-    Math.cos((lat1 * Math.PI) / 180) * Math.cos((lat2 * Math.PI) / 180) * Math.sin(dLng / 2) ** 2;
-  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+// テキスト検索（より柔軟）
+export function textSearch(
+  query: string,
+  lat: number,
+  lng: number,
+  radius: number = 1000
+): Promise<PlaceResult[]> {
+  const inner = new Promise<PlaceResult[]>((resolve) => {
+    try {
+      const div = document.createElement('div');
+      const service = new google.maps.places.PlacesService(div);
+
+      service.textSearch(
+        {
+          query,
+          location: new google.maps.LatLng(lat, lng),
+          radius,
+        },
+        (results, status) => {
+          console.log(`[textSearch] "${query}" → status: ${status}, count: ${results?.length ?? 0}`);
+          if (status === google.maps.places.PlacesServiceStatus.OK && results) {
+            const places: PlaceResult[] = results.slice(0, 8).map((p) => ({
+              name: p.name ?? '',
+              vicinity: p.formatted_address ?? '',
+              rating: p.rating ?? 0,
+              types: p.types ?? [],
+              lat: p.geometry?.location?.lat() ?? 0,
+              lng: p.geometry?.location?.lng() ?? 0,
+              priceLevel: p.price_level,
+              placeId: p.place_id ?? '',
+            }));
+            resolve(places);
+          } else {
+            resolve([]);
+          }
+        }
+      );
+    } catch (err) {
+      console.error('[textSearch] Exception:', err);
+      resolve([]);
+    }
+  });
+  return withTimeout(inner, 8000, []);
 }
