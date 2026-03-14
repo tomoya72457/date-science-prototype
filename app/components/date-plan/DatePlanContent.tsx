@@ -3,7 +3,19 @@
 import { useState } from 'react';
 import { MapPin, Clock, Wallet, Brain, ChevronRight, Navigation, Search, Coffee, UtensilsCrossed, Footprints, Wine, ShoppingBag, Sparkles } from 'lucide-react';
 import { MOCK_DATE_PLANS } from '@/app/lib/constants';
-import type { DatePlan, DateSpot } from '@/app/lib/types';
+import type { DateSpot } from '@/app/lib/types';
+
+// API返却またはモックのプラン型
+interface PlanData {
+  id: number;
+  title: string;
+  theme: string;
+  totalBudget: string;
+  totalTime: string;
+  matchScore: number;
+  spots: { id: number; name: string; category: string; time: string; duration: string; budget: string; description: string; tip: string; area: string }[];
+  aiComment: string;
+}
 
 const AREA_OPTIONS = ["渋谷", "恵比寿", "表参道"];
 
@@ -29,22 +41,52 @@ export default function DatePlanContent() {
   const [departure, setDeparture] = useState('');
   const [destination, setDestination] = useState('');
   const [selectedArea, setSelectedArea] = useState<string | null>(null);
-  const [plans, setPlans] = useState<DatePlan[]>([]);
+  const [plans, setPlans] = useState<PlanData[]>([]);
   const [searching, setSearching] = useState(false);
   const [expandedPlan, setExpandedPlan] = useState<number | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleSearch = () => {
+  const handleSearch = async () => {
     if (!departure && !destination && !selectedArea) return;
 
     setSearching(true);
-    // 入力されたエリアに近いプランを検索（モック）
-    setTimeout(() => {
-      const area = selectedArea || detectArea(departure, destination);
-      const results = MOCK_DATE_PLANS[area] ?? MOCK_DATE_PLANS["渋谷"];
-      setPlans(results);
-      setSearching(false);
-      if (results.length > 0) setExpandedPlan(results[0].id);
-    }, 800);
+    setError(null);
+    setPlans([]);
+
+    try {
+      // Google Maps API経由でリアルなスポットを取得
+      const res = await fetch('/api/date-plan', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          departure: departure || '',
+          destination: destination || selectedArea || '',
+        }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        if (data.plans && data.plans.length > 0) {
+          setPlans(data.plans);
+          setExpandedPlan(data.plans[0].id);
+          setSearching(false);
+          return;
+        }
+      }
+
+      // APIが失敗した場合はモックデータにフォールバック
+      fallbackToMock();
+    } catch {
+      fallbackToMock();
+    }
+  };
+
+  const fallbackToMock = () => {
+    const area = selectedArea || detectArea(departure, destination);
+    const results = MOCK_DATE_PLANS[area] ?? MOCK_DATE_PLANS["渋谷"];
+    setPlans(results);
+    if (results.length > 0) setExpandedPlan(results[0].id);
+    setSearching(false);
   };
 
   const detectArea = (dep: string, dest: string): string => {
@@ -144,6 +186,13 @@ export default function DatePlanContent() {
         </button>
       </div>
 
+      {/* Error */}
+      {error && (
+        <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-4 mb-4">
+          <p className="text-xs text-red-400">{error}</p>
+        </div>
+      )}
+
       {/* Results */}
       {plans.length > 0 && (
         <div className="space-y-4">
@@ -185,8 +234,9 @@ export default function DatePlanContent() {
                   {/* Timeline */}
                   <div className="relative">
                     {plan.spots.map((spot, i) => {
-                      const Icon = CATEGORY_ICONS[spot.category];
-                      const colorClass = CATEGORY_COLORS[spot.category];
+                      const cat = (spot.category as DateSpot['category']) || 'walk';
+                      const Icon = CATEGORY_ICONS[cat] ?? Footprints;
+                      const colorClass = CATEGORY_COLORS[cat] ?? CATEGORY_COLORS['walk'];
                       const isLast = i === plan.spots.length - 1;
 
                       return (
