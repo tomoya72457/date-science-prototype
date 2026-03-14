@@ -2,11 +2,75 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, MessageSquare, MapPin, CheckSquare, Brain } from 'lucide-react';
-import { MOCK_MATCHES, MOCK_CONVERSATION_TOPICS, MOCK_DATE_COURSES, MOCK_PREP_CHECKLIST } from '@/app/lib/constants';
+import { ArrowLeft, MessageSquare, MapPin, CheckSquare, Brain, ChevronDown, ChevronUp } from 'lucide-react';
+import { MOCK_MATCHES, MATCH_CONVERSATION_TOPICS, MOCK_DATE_COURSES, MOCK_PREP_CHECKLIST } from '@/app/lib/constants';
+import type { ConversationTopic } from '@/app/lib/types';
 
 interface PreSupportContentProps {
   matchId: string;
+}
+
+function TopicCard({ topic }: { topic: ConversationTopic }) {
+  const [open, setOpen] = useState(false);
+
+  const riskColors = {
+    safe: 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400',
+    moderate: 'bg-amber-500/10 border-amber-500/30 text-amber-400',
+    bold: 'bg-rose-500/10 border-rose-500/30 text-rose-400',
+  };
+  const riskLabels = { safe: '安全', moderate: '中程度', bold: '大胆' };
+
+  return (
+    <div className={`rounded-xl border overflow-hidden ${riskColors[topic.riskLevel]}`}>
+      <button onClick={() => setOpen(!open)} className="w-full p-4 text-left">
+        <div className="flex items-start justify-between gap-2 mb-1">
+          <span className="text-sm font-bold text-slate-200 leading-snug">{topic.topic}</span>
+          <div className="flex items-center gap-2 shrink-0">
+            <span className={`px-2 py-0.5 rounded text-[10px] font-bold border ${riskColors[topic.riskLevel]}`}>
+              {riskLabels[topic.riskLevel]}
+            </span>
+            {open ? <ChevronUp size={14} className="text-slate-500" /> : <ChevronDown size={14} className="text-slate-500" />}
+          </div>
+        </div>
+        <p className="text-xs text-slate-400">{topic.reason}</p>
+      </button>
+
+      {open && (
+        <div className="px-4 pb-4 space-y-3 border-t border-slate-700/30 pt-3">
+          {/* 自分の切り出し（右） */}
+          <div className="flex justify-end">
+            <p className="text-xs text-slate-200 leading-relaxed bg-rose-500/20 rounded-2xl rounded-tr-sm p-3 border border-rose-500/25 max-w-[80%]">
+              {topic.opener}
+            </p>
+          </div>
+          {/* 相手の返答（左） */}
+          <div className="flex justify-start">
+            <p className="text-xs text-slate-300 leading-relaxed bg-slate-700/60 rounded-2xl rounded-tl-sm p-3 border border-slate-600/40 max-w-[80%]">
+              {topic.openerReply}
+            </p>
+          </div>
+          {topic.followUp && (
+            <>
+              {/* 自分の掘り下げ（右） */}
+              <div className="flex justify-end">
+                <p className="text-xs text-slate-200 leading-relaxed bg-rose-500/15 rounded-2xl rounded-tr-sm p-3 border border-rose-500/20 max-w-[80%]">
+                  {topic.followUp}
+                </p>
+              </div>
+              {/* 相手の返答（左） */}
+              {topic.followUpReply && (
+                <div className="flex justify-start">
+                  <p className="text-xs text-slate-300 leading-relaxed bg-slate-700/60 rounded-2xl rounded-tl-sm p-3 border border-slate-600/40 max-w-[80%]">
+                    {topic.followUpReply}
+                  </p>
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      )}
+    </div>
+  );
 }
 
 export default function PreSupportContent({ matchId }: PreSupportContentProps) {
@@ -28,12 +92,7 @@ export default function PreSupportContent({ matchId }: PreSupportContentProps) {
     );
   }
 
-  const riskColors = {
-    safe: 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400',
-    moderate: 'bg-amber-500/10 border-amber-500/30 text-amber-400',
-    bold: 'bg-rose-500/10 border-rose-500/30 text-rose-400',
-  };
-  const riskLabels = { safe: '安全', moderate: '中程度', bold: '大胆' };
+  const topics = MATCH_CONVERSATION_TOPICS[match.id] ?? [];
 
   return (
     <div className="h-full overflow-y-auto pb-24">
@@ -55,27 +114,24 @@ export default function PreSupportContent({ matchId }: PreSupportContentProps) {
           </div>
           <div>
             <h3 className="font-bold text-white text-sm">{match.name}さんとのデート準備</h3>
-            <p className="text-xs text-slate-400">相性スコア: {match.score}%</p>
+            <p className="text-xs text-slate-400">
+              {match.job} / {match.tags.map(t => `#${t}`).join(' ')}
+            </p>
           </div>
         </div>
 
         {/* Conversation Topics */}
         <div>
-          <div className="flex items-center gap-2 mb-3">
-            <MessageSquare size={16} className="text-blue-400" />
-            <h3 className="text-sm font-bold text-slate-300">会話トピック提案</h3>
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <MessageSquare size={16} className="text-blue-400" />
+              <h3 className="text-sm font-bold text-slate-300">会話トピック提案</h3>
+            </div>
+            <span className="text-[10px] text-slate-500">タップで詳細</span>
           </div>
-          <div className="space-y-2">
-            {MOCK_CONVERSATION_TOPICS.map(topic => (
-              <div key={topic.id} className={`rounded-lg p-3 border ${riskColors[topic.riskLevel]}`}>
-                <div className="flex items-center justify-between mb-1">
-                  <span className="text-sm font-bold text-slate-200">{topic.topic}</span>
-                  <span className={`px-2 py-0.5 rounded text-[10px] font-bold border ${riskColors[topic.riskLevel]}`}>
-                    {riskLabels[topic.riskLevel]}
-                  </span>
-                </div>
-                <p className="text-xs text-slate-400">{topic.reason}</p>
-              </div>
+          <div className="space-y-3">
+            {topics.map(topic => (
+              <TopicCard key={topic.id} topic={topic} />
             ))}
           </div>
         </div>

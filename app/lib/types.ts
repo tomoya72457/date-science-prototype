@@ -112,12 +112,41 @@ export interface RiskAlert {
   action: string;
 }
 
+// デートプラン - スポット
+export interface DateSpot {
+  id: number;
+  name: string;
+  category: 'cafe' | 'restaurant' | 'activity' | 'walk' | 'bar' | 'shop';
+  time: string;          // "14:00" 形式
+  duration: string;      // "60min" など
+  budget: string;
+  description: string;
+  tip: string;
+  area: string;
+}
+
+// デートプラン - コース
+export interface DatePlan {
+  id: number;
+  title: string;
+  theme: string;
+  totalBudget: string;
+  totalTime: string;
+  matchScore: number;    // このコースの相性スコア
+  spots: DateSpot[];
+  aiComment: string;
+}
+
 // デート前支援 - 会話トピック
 export interface ConversationTopic {
   id: number;
   topic: string;
   riskLevel: 'safe' | 'moderate' | 'bold';
   reason: string;
+  opener: string;          // 自分の切り出しセリフ
+  openerReply: string;     // 相手の想定返答
+  followUp?: string;       // 自分の掘り下げセリフ
+  followUpReply?: string;  // 相手の想定返答
 }
 
 // デート前支援 - デートコース提案
