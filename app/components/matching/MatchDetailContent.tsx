@@ -3,8 +3,8 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { ArrowLeft, Heart, MessageCircle, Brain, Star } from 'lucide-react';
-import { MOCK_MATCHES, MOCK_USER } from '@/app/lib/constants';
+import { ArrowLeft, Heart, MessageCircle, Brain, Star, Sparkles, MapPin } from 'lucide-react';
+import { MOCK_MATCHES, MOCK_USER, MATCH_RECOMMENDATIONS } from '@/app/lib/constants';
 import RadarChart from '../shared/RadarChart';
 
 interface MatchDetailContentProps {
@@ -168,6 +168,60 @@ export default function MatchDetailContent({ matchId }: MatchDetailContentProps)
             <span>メッセージ</span>
           </button>
         </div>
+
+        {/* マッチング成功後の推奨コンテンツ */}
+        {isLiked && MATCH_RECOMMENDATIONS[match.id] && (
+          <div className="space-y-5 animate-fade-in">
+            {/* マッチング成功バナー */}
+            <div className="bg-gradient-to-r from-rose-500/20 to-emerald-500/20 rounded-2xl p-5 border border-rose-500/30 text-center">
+              <div className="flex justify-center mb-2">
+                <Sparkles size={32} className="text-rose-400" />
+              </div>
+              <h3 className="text-lg font-bold text-white mb-1">マッチング成立！</h3>
+              <p className="text-sm text-slate-300">
+                {match.name}さんとマッチングしました。<br/>
+                AIがあなたたちに最適なアプローチとデートコースを提案します。
+              </p>
+            </div>
+
+            {/* おすすめアプローチ */}
+            <div className="bg-slate-800 rounded-2xl p-5 border border-slate-700">
+              <h4 className="font-bold text-rose-400 text-sm mb-4 flex items-center gap-2">
+                <Brain size={16} />
+                おすすめアプローチ方法
+              </h4>
+              <div className="space-y-4">
+                {MATCH_RECOMMENDATIONS[match.id].approaches.map((approach, i) => (
+                  <div key={i} className="bg-slate-900/50 rounded-lg p-4 border border-slate-700/50">
+                    <h5 className="font-bold text-slate-200 text-sm mb-2">{approach.title}</h5>
+                    <p className="text-xs text-slate-400 mb-2">{approach.description}</p>
+                    <p className="text-xs text-rose-400/90 font-medium">💡 {approach.tip}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* おすすめデートコース */}
+            <div className="bg-slate-800 rounded-2xl p-5 border border-slate-700">
+              <h4 className="font-bold text-emerald-400 text-sm mb-4 flex items-center gap-2">
+                <MapPin size={16} />
+                おすすめデートコース
+              </h4>
+              <div className="space-y-4">
+                {MATCH_RECOMMENDATIONS[match.id].dateCourses.map((course, i) => (
+                  <div key={i} className="bg-slate-900/50 rounded-lg p-4 border border-slate-700/50">
+                    <div className="flex justify-between items-start mb-2">
+                      <h5 className="font-bold text-slate-200 text-sm">{course.name}</h5>
+                      <span className="text-[10px] text-slate-500">{course.budget}</span>
+                    </div>
+                    <p className="text-[10px] text-rose-400/90 mb-1">{course.area}</p>
+                    <p className="text-xs text-slate-400">{course.description}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Tips */}
         <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700/50">

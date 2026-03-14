@@ -1,10 +1,12 @@
 'use client';
 
-import Link from 'next/link';
-import { User, Activity, ClipboardCheck, Search } from 'lucide-react';
+import { User, ClipboardCheck, Search } from 'lucide-react';
 import { MOCK_USER } from '@/app/lib/constants';
 import StatsCard from './StatsCard';
 import ActionCard from './ActionCard';
+import RiskAlertBanner from './RiskAlertBanner';
+import ImprovementCard from './ImprovementCard';
+import QuickAccessSection from './QuickAccessSection';
 
 export default function DashboardContent() {
   return (
@@ -19,7 +21,13 @@ export default function DashboardContent() {
         </div>
       </header>
 
+      <RiskAlertBanner />
+
       <StatsCard user={MOCK_USER} />
+
+      <QuickAccessSection />
+
+      <ImprovementCard />
 
       <h3 className="text-sm font-bold text-slate-300 mb-3 px-1">次のアクション</h3>
       <div className="space-y-3">
